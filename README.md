@@ -23,7 +23,7 @@ I try to keep the same name for my virtualenv so that whenever I go in a project
 
 	$ rm -rf docs README.md
 
-We can always come back to his documentation on [Read the doc]{http://django-skel.readthedocs.org/}. He usually propose to create apps in the ``apps`` folder, but small project you can prefer to create only one app like this:
+We can always come back to his documentation on [Read the doc](http://django-skel.readthedocs.org/). He usually propose to create apps in the ``apps`` folder, but small project you can prefer to create only one app like this:
 
 	$ django-admin.py startapp apps PROJECT_NAME/apps
 
@@ -49,7 +49,7 @@ And the later
 
 	$ manage.py migrate apps
 
-[Full documentation]{http://south.readthedocs.org/en/latest/index.html}
+[Full documentation](http://south.readthedocs.org/en/latest/index.html)
 
 Notes
 =====
