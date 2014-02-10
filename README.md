@@ -1,5 +1,5 @@
-django-my-skel
-==============
+My Django Skeleton
+==================
 
 My own Django project skeleton. [From Randall Degges](https://github.com/rdegges/django-skel/)
 
