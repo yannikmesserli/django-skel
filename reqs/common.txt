@@ -6,4 +6,4 @@ Fabric
 South
 Sphinx
 django_forms_bootstrap
-
+dj_static
