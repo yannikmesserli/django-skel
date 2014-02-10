@@ -1,66 +1,62 @@
-django-skel
-===========
+django-my-skel
+==============
 
-A modern Django (1.5) project skeleton.
-
-![A fancy Django project skeleton](https://github.com/rdegges/django-skel/raw/master/docs/source/_static/skel.jpg)
+My own Django project skeleton. [From Randall Degges](https://github.com/rdegges/django-skel/)
 
 
-Meta
-====
+Quickstart
+==========
 
-* author: Randall Degges
-* email:  rdegges@gmail.com
-* status: maintained, in development
-* notes:  Have feedback? Please send me an email. This project is still in its
-          infancy, and will be changing rapidly.
+To create a new django-skel base project, run the following command (this assumes you have Django installed already):
 
-
-Purpose
-=======
-
-For background, see: http://rdegges.com/deploying-django
-
-Essentially--deploying Django projects is hard. There are lots of things you
-need to take into consideration. Being a Django user for years, I believe I've
-found some extremely useful patterns to help manage all sorts of Django sites
-(from the very smallest apps, to the largest).
-
-This project is meant to be a boilerplate project for starting development. It
-is heavily opinionated in terms of services and tools--but I think the tradeoff
-is worthwhile.
-
-
-Docs
-====
-
-The full project documentation is hosted at RTFD: http://django-skel.rtfd.org/.
-They are continuously updated to reflect changes and information about the
-project, so be sure to read them before using this boilerplate.
-
-
-Install
-=======
-
-django-skel currently supports Django 1.5. To create a new django-skel base
-project, run the following command (this assumes you have Django 1.5 installed
-already):
-
-    $ django-admin.py startproject --template=https://github.com/rdegges/django-skel/zipball/master woot
+    $ django-admin.py startproject --template=https://github.com/yannikmesserli/django-skel/ PROJECT_NAME
+    $ cd PROJECT_NAME
     $ heroku config:add DJANGO_SETTINGS_MODULE=myproject.settings.prod
 
 
-Where ``woot`` is the name of the project you'd like to create.
+Where ``PROJECT_NAME`` is the name of the project you'd like to create. Then create a virtualenv to isolate your package dependencies locally:
 
-This is possible because Django 1.5's ``startproject`` command allows you to
-fetch a project template over HTTP (which is what we're doing here).
+	$ virtualenv ENV
+	$ source ENV/bin/activate
 
-While not strictly required, it is also recommended to do
+I try to keep the same name for my virtualenv so that whenever I go in a project I know exactly how to active it. Then the next thing you probably want to do is remove Randall's project docs:
 
-     $ heroku config:add SECRET_KEY=putsomethingfairlycomplexhere
+	$ rm -rf docs README.md
 
-The production settings pull SECRET_KEY from environment but fallbacks
-to a value which is generated mainly for development environment.
+We can always come back to his documentation on [Read the doc]{http://django-skel.readthedocs.org/}. He usually propose to create apps in the ``apps`` folder, but small project you can prefer to create only one app like this:
 
-This setup allows you to easily keep your site in a public repo if you so 
-wish without causing opening a route to attack your Django passwords.
+	$ django-admin.py startapp apps PROJECT_NAME/apps
+
+
+Then you can install the dev prerequies using:
+
+	$ pip install -r reqs/dev.txt
+
+And finally:
+
+	$ python manage.py syncdb
+	$ python manage.py migrate
+	$ python manage.py runserver
+
+Quick note for south
+--------------------
+The First Migration
+
+	$ python manage.py schemamigration apps --initial
+	$ python manage.py migrate apps
+
+And the later
+
+	$ manage.py migrate apps
+
+[Full documentation]{http://south.readthedocs.org/en/latest/index.html}
+
+Notes
+=====
+
+- I have added the good ``iPython notebook`` to the dev requirement. I found it really useful to take note while developping or to keep pieces of code that I run often. However iPython requires Python 2.6, 2.7, or 3.2. To open the notebook, type:
+
+	$ ipython notebook
+
+- I'm not using newrelic, so I changed the ``Procfile`` in consequence.
+- I have added ENV to the ``.gitignore``
