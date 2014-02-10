@@ -9,7 +9,7 @@ Quickstart
 
 To create a new django-skel base project, run the following command (this assumes you have Django installed already):
 
-    $ django-admin.py startproject --template=https://github.com/yannikmesserli/django-skel/ PROJECT_NAME
+    $ django-admin.py startproject --template=https://github.com/yannikmesserli/django-skel/zipball/master PROJECT_NAME
     $ cd PROJECT_NAME
     $ heroku config:add DJANGO_SETTINGS_MODULE=myproject.settings.prod
 
@@ -60,3 +60,4 @@ Notes
 
 - I'm not using newrelic, so I changed the ``Procfile`` in consequence.
 - I have added ENV to the ``.gitignore``
+- I'm using the [Django Rest Framework](http://www.django-rest-framework.org/tutorial/quickstart)
