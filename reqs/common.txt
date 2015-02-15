@@ -2,8 +2,11 @@ django
 djangorestframework
 django-celery
 django-compressor
+django-model-utils
 Fabric
-South
 Sphinx
 django_forms_bootstrap
 dj_static
+django-oauth2-provider
+django-cors-headers
+django-allauth

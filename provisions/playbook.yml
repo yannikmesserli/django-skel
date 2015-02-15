@@ -1,0 +1,119 @@
+---
+- hosts: all
+  vars:
+    server_url: "localhost"
+    project_name: "exec_summary"
+    db_pass: "X2KBe4TgJNjoeZrRcXzM"
+  tasks:
+    - name: register app_path
+      shell: pwd
+      register: app_path
+    - name: install prerequies for app
+      apt: name={{ item }} state=present
+      sudo: yes
+      with_items:
+        - build-essential
+        - postgresql 
+        - postgresql-contrib
+        - python
+        - python-pip
+        - python-dev
+        - libpq-dev
+        - nginx
+        - git
+        - libmemcached-dev
+    - name: install supervisor
+      sudo: yes
+      pip: name=supervisor
+    - name: ensuring supervisor has a directory
+      sudo: yes
+      file: path={{ item }}
+        state=directory
+      with_items:
+        - /etc/supervisor
+        - /var/log/supervisor
+        - /etc/supervisor/conf.d
+    - name: configure supervisor
+      sudo: yes
+      template: src=templates/supervisor.conf dest=/etc/supervisor/supervisor.conf
+    - name: checking if supervisord is running
+      sudo: yes
+      shell: pgrep supervisor
+      ignore_errors: yes
+      changed_when: off
+      register: supervisor_running
+    - name: running supervisord
+      sudo: yes
+      shell: supervisord -c /etc/supervisor/supervisor.conf
+      when: supervisor_running | failed
+    - name: configure gunicorn for supervisor
+      sudo: yes
+      template: src=templates/gunicorn.conf dest=/etc/supervisor/conf.d/gunicorn.conf
+
+    - name: install prerequies for ansible and postgresql
+      sudo: yes
+      pip: name=psycopg2
+    - name: create a db
+      sudo: yes
+      sudo_user: postgres
+      postgresql_db: name={{project_name}}
+    - name: create a db user
+      sudo: yes
+      sudo_user: postgres
+      postgresql_user: db={{project_name}} name={{project_name}} password={{db_pass}}
+    # - name: change pg_hba.conf
+    #   sudo: yes
+    #   template: src=templates/pg_hba.conf dest=/etc/postgresql/9.3/main/pg_hba.conf
+    # - name: restart postgresql
+    #   sudo: yes
+    #   service: name=postgresql state=restarted 
+    
+    # SSL
+    - name: ensuring ssl directory under nginx
+      sudo: yes
+      file: path=/etc/nginx/ssl
+        state=directory
+    - name: copy ssh crt
+      sudo: yes
+      copy: src=ssh_key/{{project_name}}.co.crt dest=/etc/nginx/ssl/{{project_name}}.co.crt
+    - name: copy ssh key
+      sudo: yes
+      copy: src=ssh_key/{{project_name}}.co.key dest=/etc/nginx/ssl/{{project_name}}.co.key
+    
+    # DEPLOY APP:
+    - name: add authorized_key
+      sudo: yes
+      authorized_key: user={{ansible_user_id}} key="{{ lookup('file', 'ssh/id_rsa.pub') }}"
+    # - name: add authorized_key
+    #   sudo: yes
+    #   shell: mkdir -p ~/.ssh && echo ''"{{ lookup('file', 'ssh/id_rsa.pub') }}"'' >>  ~/.ssh/authorized_keys
+    # - name: change key permision 
+    #   local_action: command chmod 600 ssh/id_rsa
+    # - name: deploy app using fabric and the key file
+    #   local_action: command fab deploy --set base_dir={{app_path.stdout}} -H {{ansible_ssh_host}}:{{ansible_ssh_port}} -u {{ansible_user_id}} -i ssh/id_rsa
+
+
+    # NGINX
+    - name: configure nginx
+      sudo: yes
+      template: src=templates/nginx_app.conf dest=/etc/nginx/sites-available/{{project_name}}.conf
+    - name: Nginx | Enable the default site
+      sudo: yes
+      file:
+        path: "/etc/nginx/sites-enabled/{{project_name}}.conf"
+        src: "/etc/nginx/sites-available/{{project_name}}.conf"
+        state: link
+      notify:
+        - restart nginx
+    - name: Nginx | Register Nginx as a service
+      service:
+        name: nginx
+        enabled: yes
+
+
+  handlers:
+    - name: restart gunicorn
+      supervisorctl: name=gunicorn state=restarted 
+    - name: restart nginx
+      service: name=nginx state=restarted
+      sudo: yes
