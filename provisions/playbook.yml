@@ -2,8 +2,8 @@
 - hosts: all
   vars:
     server_url: "localhost"
-    project_name: "exec_summary"
-    db_pass: "X2KBe4TgJNjoeZrRcXzM"
+    project_name: "project_name"
+    db_pass: "X2KBe4TgJNjoeZrRcXzM" # random password here
   tasks:
     - name: register app_path
       shell: pwd
